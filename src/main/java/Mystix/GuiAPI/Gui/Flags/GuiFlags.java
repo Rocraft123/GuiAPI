@@ -30,26 +30,19 @@ public final class GuiFlags {
     /**
      * Called when a GUI is clicked.
      */
-    public static final Flag<Consumer<GuiClickEvent>> ON_CLICK =
-            Flag.of("on_click_gui", (Class) Consumer.class);
-
+    public static final Flag<Consumer<GuiClickEvent>> ON_CLICK = Flag.of("on_click_gui", (Class) Consumer.class);
     /**
      * Called when a GUI is rendered.
      */
-    public static final Flag<Consumer<GuiRenderEvent>> ON_RENDER =
-            Flag.of("on_render_gui", (Class) Consumer.class);
-
+    public static final Flag<Consumer<GuiRenderEvent>> ON_RENDER = Flag.of("on_render_gui", (Class) Consumer.class);
     /**
      * Called when a GUI is opened.
      */
-    public static final Flag<Consumer<GuiOpenEvent>> ON_OPEN =
-            Flag.of("on_open", (Class) Consumer.class);
-
+    public static final Flag<Consumer<GuiOpenEvent>> ON_OPEN = Flag.of("on_open", (Class) Consumer.class);
     /**
      * Called when a GUI is closed.
      *
      */
-    public static final Flag<Consumer<GuiCloseEvent>> ON_CLOSE =
-            Flag.of("on_close", (Class) Consumer.class);
+    public static final Flag<Consumer<GuiCloseEvent>> ON_CLOSE = Flag.of("on_close", (Class) Consumer.class);
 }
 

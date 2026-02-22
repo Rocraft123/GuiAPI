@@ -22,7 +22,6 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public final class EntryFlags {
-
     private EntryFlags() {}
 
     /**
@@ -46,7 +45,7 @@ public final class EntryFlags {
      */
     public static final Flag<String> PERMISSION = Flag.of("permission", String.class);
     /**
-     * Message shown when permission is missing.
+     * Message shown when the user does not have the required permission.
      */
     public static final Flag<Component> PERMISSION_MSG = Flag.of("permission_msg", Component.class);
     /**
