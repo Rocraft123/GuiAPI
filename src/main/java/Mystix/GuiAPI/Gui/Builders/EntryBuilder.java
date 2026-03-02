@@ -6,9 +6,9 @@ import Mystix.GuiAPI.Gui.Entry;
 import Mystix.GuiAPI.Gui.Flags.EntryFlags;
 import Mystix.GuiAPI.Gui.Flags.Flag;
 import Mystix.GuiAPI.Gui.Gui;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -272,7 +272,7 @@ public class EntryBuilder implements Builder<Entry> {
      * @param cooldown cooldown duration
      * @return this builder
      */
-    public EntryBuilder setCooldown(int cooldown) {
+    public EntryBuilder setCooldown(long cooldown) {
         this.entry.setFlag(EntryFlags.COOLDOWN, cooldown);
         return this;
     }

@@ -3,8 +3,8 @@ package Mystix.GuiAPI.Gui.Flags;
 import Mystix.GuiAPI.Event.Events.EntryClickEvent;
 import Mystix.GuiAPI.Event.Events.EntryRenderEvent;
 import Mystix.GuiAPI.Gui.Gui;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Sound;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -55,7 +55,7 @@ public final class EntryFlags {
     /**
      * Click cooldown in ticks.
      */
-    public static final Flag<Integer> COOLDOWN = Flag.of("cooldown", Integer.class);
+    public static final Flag<Long> COOLDOWN = Flag.of("cooldown", Long.class);
     /**
      * Sound played on click.
      */

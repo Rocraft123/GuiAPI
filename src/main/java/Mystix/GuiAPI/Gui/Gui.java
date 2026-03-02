@@ -3,9 +3,10 @@ package Mystix.GuiAPI.Gui;
 import Mystix.GuiAPI.Event.Events.EntryRenderEvent;
 import Mystix.GuiAPI.Event.Events.GuiOpenEvent;
 import Mystix.GuiAPI.Event.Events.GuiRenderEvent;
-import Mystix.GuiAPI.Gui.Builders.EntryBuilder;
 import Mystix.GuiAPI.Gui.Builders.GuiBuilder;
+import Mystix.GuiAPI.Gui.Flags.EntryFlags;
 import Mystix.GuiAPI.Gui.Flags.Flag;
+import Mystix.GuiAPI.Gui.Flags.GuiFlags;
 import Mystix.GuiAPI.InitializedGuiAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -313,9 +314,16 @@ public class Gui {
 
         GuiRenderEvent event = new GuiRenderEvent(this, player);
         api.getEventManager().callEvent(event);
+
+        if (hasFlag(GuiFlags.ON_RENDER))
+            getFlag(GuiFlags.ON_RENDER).accept(event);
+
         if (!event.isCancelled()) render(inventory, player);
 
         GuiOpenEvent openEvent = new GuiOpenEvent(this, player);
+        if (hasFlag(GuiFlags.ON_OPEN))
+            getFlag(GuiFlags.ON_OPEN).accept(openEvent);
+
         if (openEvent.isCancelled()) return inventory;
 
         player.openInventory(inventory);
@@ -330,6 +338,9 @@ public class Gui {
 
             EntryRenderEvent event = new EntryRenderEvent(entry, this, player);
             api.getEventManager().callEvent(event);
+
+            if (entry.hasFlag(EntryFlags.ON_RENDER))
+                entry.getFlag(EntryFlags.ON_RENDER).accept(event);
 
             if (!event.isCancelled())
                 inventory.setItem(i, entry.getItem());

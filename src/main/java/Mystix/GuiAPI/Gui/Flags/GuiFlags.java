@@ -4,6 +4,7 @@ import Mystix.GuiAPI.Event.Events.GuiClickEvent;
 import Mystix.GuiAPI.Event.Events.GuiCloseEvent;
 import Mystix.GuiAPI.Event.Events.GuiOpenEvent;
 import Mystix.GuiAPI.Event.Events.GuiRenderEvent;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Consumer;
 
@@ -24,7 +25,6 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public final class GuiFlags {
-
     private GuiFlags() {}
 
     /**

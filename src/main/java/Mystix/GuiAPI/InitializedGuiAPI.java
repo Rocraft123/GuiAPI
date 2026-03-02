@@ -10,6 +10,8 @@ import Mystix.GuiAPI.Gui.Flags.EntryFlags;
 import Mystix.GuiAPI.Gui.Flags.GuiFlags;
 import Mystix.GuiAPI.Gui.Gui;
 import Mystix.GuiAPI.Gui.GuiHolder;
+import Mystix.GuiAPI.Utils.Cooldown.Cooldown;
+import Mystix.GuiAPI.Utils.Cooldown.CooldownManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,6 +20,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -78,6 +81,7 @@ public final class InitializedGuiAPI implements Listener {
     private final boolean debug;
 
     private final EventManager eventManager = new EventManager(this);
+    private final CooldownManager<Entry> cooldownManager = new CooldownManager<>();
 
     /**
      * Creates and initializes the GUI API runtime.
@@ -133,6 +137,13 @@ public final class InitializedGuiAPI implements Listener {
     }
 
     /**
+     * @return the cooldown manager
+     */
+    public CooldownManager<Entry> getCooldownManager() {
+        return cooldownManager;
+    }
+
+    /**
      * @return the logger
      */
     public Logger getLogger() {
@@ -140,7 +151,7 @@ public final class InitializedGuiAPI implements Listener {
     }
 
     /**
-     * @return the owning plugin/
+     * @return the owning plugin
      */
     public Plugin getProvider() {
         return provider;
@@ -167,40 +178,53 @@ public final class InitializedGuiAPI implements Listener {
         GuiClickEvent guiClickEvent = new GuiClickEvent(gui, entry, player, slot, event.getAction(), event.getClick());
         eventManager.callEvent(guiClickEvent);
 
+        if (gui.hasFlag(GuiFlags.ON_CLICK))
+            entry.getFlag(GuiFlags.ON_CLICK).accept(guiClickEvent);
+
         EntryClickEvent entryClickEvent = new EntryClickEvent(entry, gui, player, slot, event.getAction(), event.getClick());
         entryClickEvent.setCancelled(guiClickEvent.isCancelled());
         eventManager.callEvent(entryClickEvent);
+
+        if (entryClickEvent.isCancelled()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (entry.hasFlag(EntryFlags.COOLDOWN)) {
+            if (cooldownManager.isOnCooldown(entry)) {
+                event.setCancelled(true);
+                return;
+            }
+            cooldownManager.setCooldown(entry, new Cooldown(entry.getFlag(EntryFlags.COOLDOWN)));
+        }
 
         if (entry.hasFlag(EntryFlags.PERMISSION)) {
             if (!player.hasPermission(entry.getFlag(EntryFlags.PERMISSION))) {
                 event.setCancelled(true);
 
-                if (entry.hasFlag(EntryFlags.PERMISSION_MSG)) {
-                    Component message = entry.getFlag(EntryFlags.PERMISSION_MSG);
-                    player.sendMessage(message);
-                }
+                if (entry.hasFlag(EntryFlags.PERMISSION_MSG))
+                    player.sendMessage(entry.getFlag(EntryFlags.PERMISSION_MSG));
                 return;
             }
         }
-
         if (entry.hasFlag(EntryFlags.COMMANDS)) {
             List<String> commands = entry.getFlag(EntryFlags.COMMANDS);
             for (String command : commands)
                 player.chat("/" + command.replace("/", ""));
         }
 
-        if (entry.hasFlag(EntryFlags.ON_CLICK))
-            entry.getFlag(EntryFlags.ON_CLICK).accept(entryClickEvent);
 
-        if (entry.hasFlag(EntryFlags.CANCEL))
-            event.setCancelled(entry.getFlag(EntryFlags.CANCEL));
+        if (entry.hasFlag(EntryFlags.MESSAGE)) player.sendMessage(entry.getFlag(EntryFlags.MESSAGE));
+        if (entry.hasFlag(EntryFlags.CLICK_SOUND)) player.playSound(entry.getFlag(EntryFlags.CLICK_SOUND));
+        if (entry.hasFlag(EntryFlags.ON_CLICK)) entry.getFlag(EntryFlags.ON_CLICK).accept(entryClickEvent);
+
+        if (entry.hasFlag(EntryFlags.CANCEL)) event.setCancelled(entry.getFlag(EntryFlags.CANCEL));
         else event.setCancelled(entryClickEvent.isCancelled());
 
-        if (entry.hasFlag(EntryFlags.NAVIGATE_TO) && !entryClickEvent.isCancelled()) {
-            Gui target = entry.getFlag(EntryFlags.NAVIGATE_TO);
-            target.open(player);
-        }
+        if (!event.isCancelled() && entry.hasFlag(EntryFlags.NAVIGATE_TO))
+            entry.getFlag(EntryFlags.NAVIGATE_TO).open(player);
     }
+
 
     @EventHandler
     private void onInventoryClose(InventoryCloseEvent event) {
