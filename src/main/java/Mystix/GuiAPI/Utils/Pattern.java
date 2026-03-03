@@ -1,6 +1,7 @@
 package Mystix.GuiAPI.Utils;
 
 import Mystix.GuiAPI.Gui.Entry;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 import java.util.*;
 
@@ -59,6 +60,7 @@ public class Pattern {
     public Pattern(int size) {
         if (size % 9 != 0)
             throw new IllegalArgumentException("GUI size must be a multiple of 9");
+
         this.size = size;
         this.rows = size / 9;
         this.layout = new String[this.rows];
@@ -128,7 +130,6 @@ public class Pattern {
         return this.layout.clone();
     }
 
-
     /**
      * @return an unmodifiable bindings map
      */
@@ -159,14 +160,14 @@ public class Pattern {
      * @param symbol the pattern character
      * @return matching slot indices
      */
-    public List<Integer> getSlotsFor(char symbol) {
-        List<Integer> slots = new ArrayList<>();
+    public IntArrayList getSlotsFor(char symbol) {
+        IntArrayList slots = new IntArrayList();
         for (int r = 0; r < rows; r++) {
             String row = layout[r];
             if (row == null) continue;
-            for (int c = 0; c < 9; c++) {
+
+            for (int c = 0; c < 9; c++)
                 if (row.charAt(c) == symbol) slots.add(r * 9 + c);
-            }
         }
         return slots;
     }
@@ -178,7 +179,7 @@ public class Pattern {
      * @return slot index, or {@code -1}
      */
     public int getFirstSlotFor(char symbol) {
-        List<Integer> slots = getSlotsFor(symbol);
+        IntArrayList slots = getSlotsFor(symbol);
         return slots.isEmpty() ? -1 : slots.getFirst();
     }
 }

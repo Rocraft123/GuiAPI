@@ -1,7 +1,11 @@
 package Mystix.GuiAPI.Utils;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a reusable collection of GUI slot indices.
@@ -19,7 +23,7 @@ import java.util.List;
  *
  * @since 0.1.0-alpha
  */
-public record SlotArea(List<Integer> slots) {
+public record SlotArea(IntArrayList slots) {
 
     /**
      * Creates a slot area from a continuous range.
@@ -29,7 +33,7 @@ public record SlotArea(List<Integer> slots) {
      * @return a slot area
      */
     public static SlotArea ofRange(int start, int end) {
-        List<Integer> slots = new ArrayList<>();
+        IntArrayList slots = new IntArrayList();
         for (int i = start; i <= end; i++) slots.add(i);
         return new SlotArea(slots);
     }
@@ -41,7 +45,7 @@ public record SlotArea(List<Integer> slots) {
      * @return a slot area
      */
     public static SlotArea ofRows(int... rows) {
-        List<Integer> slots = new ArrayList<>();
+        IntArrayList slots = new IntArrayList(rows.length * 9);
         for (int row : rows)
             for (int i = 0; i < 9; i++)
                 slots.add(row * 9 + i);
@@ -55,7 +59,7 @@ public record SlotArea(List<Integer> slots) {
      * @return a full slot area
      */
     public static SlotArea full(int guiSize) {
-        List<Integer> slots = new ArrayList<>();
+        IntArrayList slots = new IntArrayList(guiSize);
         for (int i = 0; i < guiSize; i++)
             slots.add(i);
 

@@ -12,7 +12,6 @@ import Mystix.GuiAPI.Gui.Gui;
 import Mystix.GuiAPI.Gui.GuiHolder;
 import Mystix.GuiAPI.Utils.Cooldown.Cooldown;
 import Mystix.GuiAPI.Utils.Cooldown.CooldownManager;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,9 +19,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.units.qual.C;
 
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,7 +79,7 @@ public final class InitializedGuiAPI implements Listener {
     private final boolean debug;
 
     private final EventManager eventManager = new EventManager(this);
-    private final CooldownManager<Entry> cooldownManager = new CooldownManager<>();
+    private final Map<UUID, CooldownManager<Entry>> cooldownManager = new HashMap<>();
 
     /**
      * Creates and initializes the GUI API runtime.
@@ -105,21 +103,6 @@ public final class InitializedGuiAPI implements Listener {
     }
 
     /**
-     * Creates a new GUI builder.
-     *
-     * @param title the GUI title
-     * @param size the GUI size (must be a multiple of 9)
-     * @return a new {@link GuiBuilder}
-     *
-     * @throws IllegalArgumentException if size is invalid
-     *
-     * @see GuiBuilder
-     */
-    public GuiBuilder createGui(Component title, int size) {
-        return new GuiBuilder(title, size, this);
-    }
-
-    /**
      * Logs a debug message if debug mode is enabled.
      *
      * @param level the log level
@@ -139,8 +122,8 @@ public final class InitializedGuiAPI implements Listener {
     /**
      * @return the cooldown manager
      */
-    public CooldownManager<Entry> getCooldownManager() {
-        return cooldownManager;
+    public CooldownManager<Entry> getCooldownManager(UUID uuid) {
+        return cooldownManager.computeIfAbsent(uuid, u -> new CooldownManager<>());
     }
 
     /**
@@ -189,6 +172,8 @@ public final class InitializedGuiAPI implements Listener {
             event.setCancelled(true);
             return;
         }
+
+        CooldownManager<Entry> cooldownManager = getCooldownManager(player.getUniqueId());
 
         if (entry.hasFlag(EntryFlags.COOLDOWN)) {
             if (cooldownManager.isOnCooldown(entry)) {

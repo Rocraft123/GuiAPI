@@ -41,8 +41,8 @@ public class EventManager {
                 handlers.removeIf(handler::equals));
     }
 
-    public void unregisterAll(@NotNull Class<Event> clazz) {
-        handlersMap.getOrDefault(clazz, new ArrayList<>()).clear();
+    public void unregisterAll(@NotNull Class<? extends Event> clazz) {
+        handlersMap.remove(clazz);
     }
 
     public void unregisterAll() {

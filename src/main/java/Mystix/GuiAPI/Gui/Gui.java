@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 /**
@@ -61,7 +62,7 @@ public class Gui {
 
     private final Map<Flag<?>, Object> flags = new HashMap<>();
 
-    private final List<Entry> entries = new ArrayList<>();
+    private final Map<Integer, Entry> entries;
     private final InitializedGuiAPI api;
 
     private int size;
@@ -81,12 +82,10 @@ public class Gui {
         if (size % 9 != 0)
             throw new IllegalArgumentException("GUI size must be a multiple of 9");
 
+        this.entries = new HashMap<>((int) (size / 0.75f) + 1);
         this.api = api;
         this.title = title;
         this.size = size;
-
-        for (int i = 0; i < size; i++)
-            entries.add(null);
     }
 
     /**
@@ -97,8 +96,9 @@ public class Gui {
      *
      * @throws IndexOutOfBoundsException if the slot is outside the GUI bounds
      */
-    public void setEntry(int slot, Entry entry) {
-        this.entries.set(slot, entry);
+    public void setEntry(int slot, @Nullable Entry entry) {
+        if (entry == null) this.entries.remove(slot);
+        else this.entries.put(slot, entry);
     }
 
 
@@ -109,9 +109,10 @@ public class Gui {
      * @return {@code true} if the entry was added, {@code false} if the GUI is full
      */
     public boolean addEntry(Entry entry) {
-        if (getFirstEmpty() == -1) return false;
+        int slot = getFirstEmpty();
+        if (slot == -1) return false;
 
-        this.entries.set(getFirstEmpty(), entry);
+        entries.put(slot, entry);
         return true;
     }
 
@@ -134,7 +135,7 @@ public class Gui {
     public boolean remove(int slot) {
         if (entries.get(slot) == null) return false;
 
-        this.entries.set(slot, null);
+        this.entries.remove(slot);
         return true;
     }
 
@@ -146,7 +147,7 @@ public class Gui {
     public void remove(Entry entry) {
         for (int i = 0; i < entries.size(); i++) {
             if (entries.get(i) != null && entries.get(i).equals(entry))
-                entries.set(i, null);
+                entries.remove(i);
         }
     }
 
@@ -154,16 +155,16 @@ public class Gui {
      * Clears all entries from the GUI.
      */
     public void clear() {
-        for (int i = 0; i < size; i++)
-            entries.set(i, null);
+        entries.clear();
     }
+
     /**
      * Returns the backing entry list.
      *
      * @return the list of entries (unmodifiable)
      */
-    public List<Entry> getEntries() {
-        return Collections.unmodifiableList(entries);
+    public Collection<Entry> getEntries() {
+        return entries.values();
     }
 
     /**
@@ -186,20 +187,6 @@ public class Gui {
      */
     public int getSize() {
         return size;
-    }
-
-    /**
-     * Sets the GUI size.
-     *
-     * @param size the new size (must be a multiple of 9)
-     *
-     * @throws IllegalArgumentException if {@code size} is not a multiple of 9
-     */
-    public void setSize(int size) {
-        if (size % 9 != 0)
-            throw new IllegalArgumentException("GUI size must be a multiple of 9");
-
-        this.size = size;
     }
 
     /**
@@ -276,11 +263,10 @@ public class Gui {
      */
     public Gui copy() {
         Gui clone = new Gui(title, size, api);
-        for (int i = 0; i < size; i++) {
-            Entry entry = this.entries.get(i);
-            if (entry != null)
-                clone.setEntry(i, entry.clone());
-        }
+
+        for (Map.Entry<Integer, Entry> e : entries.entrySet())
+            clone.entries.put(e.getKey(), e.getValue().clone());
+
         clone.flags.putAll(this.flags);
         return clone;
     }
@@ -332,8 +318,9 @@ public class Gui {
 
     private void render(Inventory inventory, Player player) {
         inventory.clear();
-        for (int i = 0; i < inventory.getSize(); i++) {
-            Entry entry = entries.get(i);
+
+        for (Map.Entry<Integer, Entry> mapEntry : entries.entrySet()) {
+            Entry entry = mapEntry.getValue();
             if (entry == null) continue;
 
             EntryRenderEvent event = new EntryRenderEvent(entry, this, player);
@@ -343,7 +330,7 @@ public class Gui {
                 entry.getFlag(EntryFlags.ON_RENDER).accept(event);
 
             if (!event.isCancelled())
-                inventory.setItem(i, entry.getItem());
+                inventory.setItem(mapEntry.getKey(), entry.getItem());
         }
     }
 
@@ -360,12 +347,10 @@ public class Gui {
     }
 
     /**
-     * Creates an empty 6-row GUI with no title.
-     *
-     * @param api the initialized GUI API
-     * @return a new empty GUI
+     * Re-renders the GUI for all player with the gui open.
      */
-    public static Gui empty(InitializedGuiAPI api) {
-        return new Gui(Component.text(""), 54, api);
+    public void refreshAll() {
+        for (Player player : Bukkit.getOnlinePlayers())
+            refresh(player);
     }
 }

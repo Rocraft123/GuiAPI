@@ -4,9 +4,11 @@ import Mystix.GuiAPI.Gui.Entry;
 import Mystix.GuiAPI.Gui.Gui;
 import Mystix.GuiAPI.InitializedGuiAPI;
 import Mystix.GuiAPI.Utils.SlotArea;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -88,7 +90,7 @@ public class PagedGuiBuilder<T> extends GuiBuilder {
     public Gui buildPage(int page) {
         this.currentPage = page;
 
-        List<Integer> slots = area == null
+        IntArrayList slots = area == null
                 ? SlotArea.full(getGui().getSize()).slots()
                 : area.slots();
 
