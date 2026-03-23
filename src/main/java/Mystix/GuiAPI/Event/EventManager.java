@@ -5,10 +5,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
 public class EventManager {
 
-    private final Map<Class<? extends Event>, List<RegisteredHandler<?>>> handlersMap = new LinkedHashMap<>();
+    private final Map<Class<? extends Event>, Set<RegisteredHandler<?>>> handlersMap = new HashMap<>();
     private final InitializedGuiAPI guiAPI;
 
     public EventManager(InitializedGuiAPI guiAPI) {
@@ -19,8 +20,10 @@ public class EventManager {
     public void callEvent(Event event) {
         Class<?> clazz = event.getClass();
 
+        guiAPI.debug(Level.INFO,"Event called: " + event.getClass().getSimpleName());
+
         while (clazz != null && Event.class.isAssignableFrom(clazz)) {
-            List<RegisteredHandler<?>> handlers = handlersMap.getOrDefault(clazz, Collections.emptyList());
+            Set<RegisteredHandler<?>> handlers = handlersMap.getOrDefault(clazz, Collections.emptySet());
 
             for (RegisteredHandler<?> handler : handlers)
                 ((Consumer<Event>) handler.consumer).accept(event);
@@ -31,7 +34,7 @@ public class EventManager {
 
     public <T extends Event> RegisteredHandler<T> register(@NotNull Class<T> clazz, @NotNull Consumer<T> consumer) {
         RegisteredHandler<T> handler = new RegisteredHandler<>(consumer);
-        handlersMap.computeIfAbsent(clazz, c -> new ArrayList<>())
+        handlersMap.computeIfAbsent(clazz, c -> new HashSet<>())
                 .add(handler);
         return handler;
     }

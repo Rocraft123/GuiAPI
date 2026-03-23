@@ -116,9 +116,8 @@ public class EntryBuilder implements Builder<Entry> {
                 meta.addEnchant(Enchantment.LURE, 1, true);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_STORED_ENCHANTS);
             } else {
-                for (Enchantment ench : meta.getEnchants().keySet()) {
-                    meta.removeEnchant(ench);
-                }
+                for (Enchantment enchantment : meta.getEnchants().keySet())
+                    meta.removeEnchant(enchantment);
                 meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_STORED_ENCHANTS);
             }
             return meta;

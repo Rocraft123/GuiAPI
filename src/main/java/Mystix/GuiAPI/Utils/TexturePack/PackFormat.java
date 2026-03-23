@@ -10,7 +10,6 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * <p>Using this class in production code is unsupported.</p>
  */
-
 @ApiStatus.Experimental
 @ApiStatus.Internal
 @Deprecated(forRemoval = false, since = "0.1.0-alpha")

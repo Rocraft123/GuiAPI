@@ -234,7 +234,6 @@ public class Gui {
         return Collections.unmodifiableMap(flags);
     }
 
-
     /**
      * Retrieves a flag value or its default.
      *
