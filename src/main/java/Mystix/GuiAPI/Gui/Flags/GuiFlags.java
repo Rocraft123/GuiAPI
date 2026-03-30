@@ -41,8 +41,11 @@ public final class GuiFlags {
     public static final Flag<Consumer<GuiOpenEvent>> ON_OPEN = Flag.of("on_open", (Class) Consumer.class);
     /**
      * Called when a GUI is closed.
-     *
      */
     public static final Flag<Consumer<GuiCloseEvent>> ON_CLOSE = Flag.of("on_close", (Class) Consumer.class);
+    /**
+     * Time in ticks it should automatically refresh the GUI.
+     */
+    public static final Flag<Integer> REFRESH_INTERVAL = Flag.of("refresh_interval", Integer.class);
 }
 

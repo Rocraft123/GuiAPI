@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,12 +61,13 @@ import java.util.*;
  */
 public class Gui {
 
+    private final Map<UUID, BukkitTask> refresh_refresh_tasks = new HashMap<>();
     private final Map<Flag<?>, Object> flags = new HashMap<>();
 
     private final Map<Integer, Entry> entries;
     private final InitializedGuiAPI api;
 
-    private int size;
+    private final int size;
     private Component title;
     private GuiBuilder builder;
 
@@ -100,7 +102,6 @@ public class Gui {
         if (entry == null) this.entries.remove(slot);
         else this.entries.put(slot, entry);
     }
-
 
     /**
      * Adds an entry to the first available empty slot.
@@ -178,7 +179,6 @@ public class Gui {
 
         return -1;
     }
-
 
     /**
      * Returns the GUI size.
@@ -311,11 +311,16 @@ public class Gui {
 
         if (openEvent.isCancelled()) return inventory;
 
+        if (hasFlag(GuiFlags.REFRESH_INTERVAL))
+            refresh_refresh_tasks.put(player.getUniqueId(), Bukkit.getScheduler().runTaskTimer(api.getProvider(), () -> {
+                refresh(player);
+            }, getFlag(GuiFlags.REFRESH_INTERVAL), getFlag(GuiFlags.REFRESH_INTERVAL)));
+
         player.openInventory(inventory);
         return inventory;
     }
 
-    private void render(Inventory inventory, Player player) {
+    protected void render(Inventory inventory, Player player) {
         inventory.clear();
 
         for (Map.Entry<Integer, Entry> mapEntry : entries.entrySet()) {
@@ -352,4 +357,13 @@ public class Gui {
         for (Player player : Bukkit.getOnlinePlayers())
             refresh(player);
     }
+
+    public boolean stopRefreshTask(Player player) {
+        if (!refresh_refresh_tasks.containsKey(player.getUniqueId()))
+            return false;
+
+        refresh_refresh_tasks.remove(player.getUniqueId());
+        return true;
+    }
+
 }

@@ -23,6 +23,7 @@ import java.util.function.Function;
  *
  * @param <T> source item type used to generate entries
  */
+//@Deprecated(since = "0.1.0-alpha.5")
 public class PagedGuiBuilder<T> extends GuiBuilder {
 
     protected final List<T> items;

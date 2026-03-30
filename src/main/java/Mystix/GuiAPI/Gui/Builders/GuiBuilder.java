@@ -136,6 +136,11 @@ public class GuiBuilder implements Builder<Gui> {
         return this;
     }
 
+    public GuiBuilder setRefreshInterval(int interval) {
+        gui.setFlag(GuiFlags.REFRESH_INTERVAL, interval);
+        return this;
+    }
+
     /**
      * Fills the entire GUI with the given entry.
      *

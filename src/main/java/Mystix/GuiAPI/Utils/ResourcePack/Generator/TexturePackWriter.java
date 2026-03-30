@@ -1,4 +1,4 @@
-package Mystix.GuiAPI.Utils.TexturePack;
+package Mystix.GuiAPI.Utils.ResourcePack.Generator;
 
 import com.google.gson.GsonBuilder;
 import org.jetbrains.annotations.ApiStatus;

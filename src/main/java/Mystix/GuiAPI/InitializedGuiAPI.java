@@ -222,6 +222,8 @@ public final class InitializedGuiAPI implements Listener {
         if (gui.hasFlag(GuiFlags.ON_CLOSE))
             gui.getFlag(GuiFlags.ON_CLOSE).accept(closeEvent);
 
+        gui.stopRefreshTask(player);
+
         new BukkitRunnable() {
             @Override
             public void run() {
