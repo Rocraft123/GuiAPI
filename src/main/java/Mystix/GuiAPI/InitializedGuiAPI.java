@@ -180,7 +180,7 @@ public final class InitializedGuiAPI implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            cooldownManager.setCooldown(entry, new Cooldown(entry.getFlag(EntryFlags.COOLDOWN)));
+            cooldownManager.setCooldown(entry, new Cooldown(entry.getFlag(EntryFlags.COOLDOWN) / 20));
         }
 
         if (entry.hasFlag(EntryFlags.PERMISSION)) {
